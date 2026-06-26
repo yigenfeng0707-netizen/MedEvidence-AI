@@ -1,0 +1,68 @@
+========================================
+MedEvidence AI - 一键复制工具
+========================================
+
+## 魔搭部署配置（全部复制）
+
+### 基本信息
+Skill名称: medevidence-ai
+显示名称: 医学循证检索助手
+简介: 基于KnowS医学循证API的智能检索工具，支持PubMed文献检索、循证分级和智能摘要生成
+
+### 导入设置
+导入方式: 从GitHub导入
+GitHub链接: https://github.com/yigenfeng0707-netizen/MedEvidence-AI
+分支: main
+Python版本: 3.11
+启动命令: python src/main.py
+
+### 环境变量（全部复制，粘贴到高级配置）
+KNOWS_API_KEY=sk-knows-aWsL8pr0PkN88F9JlqUWzKYuwkxFw5mi
+STEPFUN_API_KEY=2XDrgYOtH3z0nnv1LoYQXD6AowAwCPwY1rZuMw6AWZES1mej4SH9MElA5wvHa4zKJ
+STEPFUN_MODEL=step-1-flash
+STEPFUN_API_BASE=https://api.stepfun.com/v1
+KNOWS_API_BASE=https://api.nullht.com/v1
+DEBUG=false
+PORT=8000
+CACHE_ENABLED=true
+CACHE_TTL=3600
+LOG_LEVEL=INFO
+
+========================================
+
+## 飞书表单（全部复制粘贴）
+
+项目名称: MedEvidence AI
+
+项目简介: 医学循证智能检索助手，基于KnowS医学循证API和StepFun大模型，支持PubMed文献检索、循证分级标注、智能摘要生成。技术栈：FastAPI + KnowS API + StepFun Flash + 魔搭ModelScope。开源协议：Apache 2.0。GitHub：https://github.com/yigenfeng0707-netizen/MedEvidence-AI
+
+项目类型: Skill
+
+魔搭链接: [部署成功后复制粘贴]
+
+GitHub链接: https://github.com/yigenfeng0707-netizen/MedEvidence-AI
+
+团队成员: yigenfeng0707-netizen
+
+联系方式: [填写你的邮箱或微信]
+
+========================================
+
+## 部署步骤速查
+
+1. 魔搭部署
+   访问: https://modelscope.cn/skills/create?template=custom
+   时间: 3分钟
+
+2. 验证
+   测试: https://your-link/modelscope/health
+   时间: 1分钟
+
+3. 飞书表单
+   访问: https://uei55ql5ok.feishu.cn/share/base/form/shrcn8RVcW8oVxgyRxQP15Tkgbh
+   时间: 1分钟
+
+========================================
+
+总用时: 5分钟
+========================================
