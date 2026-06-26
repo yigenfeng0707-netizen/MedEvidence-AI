@@ -53,22 +53,22 @@
 
 ---
 
-## ⚠️ API 集成状态（关键阻塞项）
+## ✅ API 集成状态（已全部打通）
 
 | API | 状态 | 说明 |
 |-----|------|------|
-| KnowS 医学循证 API | 🔴 阻塞 | 服务器可达、Key 格式有效，但所有端点返回 `403 - Application is not allowed to access the requested API`。**需在 KnowS 开发者平台 (https://developers.nullht.com/) 为当前应用开通 evidences 等 API 的访问权限** |
+| KnowS 医学循证 API | � 已接通 | 真实端点为 `/evidences/ai_search_paper_en`（英文文献）和 `/evidences/ai_search_guide`（指南），返回 20+ 篇真实文献，含标题/摘要/期刊/影响因子/DOI/作者/发表日期等字段。已修正原代码中错误的 `/search` 端点 |
 | StepFun 大模型 API | 🟢 已修复 | 模型名修正为 `step-2-16k` 后调用成功，可正常生成中文摘要与临床要点 |
 
-> 说明：在 KnowS 权限开通前，项目可通过 `python test_main.py` 以 Mock 模式完整演示全部功能。
+> **端到端实测**：查询 "SGLT2 inhibitors renal protection type 2 diabetes"，返回 5 篇文献 + 中文翻译 + 整体综述 + 临床要点，总耗时约 68 秒（KnowS ~1.6s + StepFun ~66s）。
 
 ---
 
 ## 🔄 进行中
 
 ### 阶段2：MVP开发（6/25-7/1）
-- [ ] **KnowS API 权限开通**（阻塞项，需联系 KnowS 平台）
-- [ ] 真实 API 端到端联调（KnowS 权限开通后）
+- [x] ~~KnowS API 权限开通~~ — 实际为端点路径错误，已修正为 `ai_search_paper_en`
+- [x] 真实 API 端到端联调（6/27 通过，KnowS + StepFun 全链路接通）
 - [ ] 魔搭社区部署
 - [ ] smart_tool.json 的 entry_point 更新为魔搭线上地址
 
@@ -119,20 +119,21 @@
 | 本地测试 | 100% | ✅ Mock 通过（6/27） |
 | Bug 修复 | 100% | ✅ 修复 3 个（6/27） |
 | GitHub 发布 | 100% | ✅ 已推送（6/27） |
-| KnowS API 集成 | 50% | 🔴 403 权限待开通 |
+| KnowS API 集成 | 100% | ✅ 已接通真实端点（6/27） |
 | StepFun API 集成 | 100% | ✅ 已修复（6/27） |
+| 端到端联调 | 100% | ✅ KnowS + StepFun 全链路通过（6/27） |
 | 魔搭部署 | 0% | ⏳ 待开始 |
 | 演示视频 | 0% | ⏳ 待开始 |
 | 飞书表单 | 0% | ⏳ 待开始 |
-| **总体进度** | **约 75%** | 🟡 阻塞于 KnowS 权限 |
+| **总体进度** | **约 80%** | � 核心功能全部打通 |
 
 ---
 
 ## 🚀 下一步（立即执行）
 
 ### 今天/明天必须完成
-1. [ ] 联系 KnowS 平台开通 API 访问权限（最高优先级，阻塞真实联调）
-2. [ ] KnowS 权限开通后，进行真实 API 端到端联调
+1. [x] ~~联系 KnowS 平台开通 API 访问权限~~ — 实际为端点路径错误，已修正并打通
+2. [x] ~~真实 API 端到端联调~~ — 6/27 已通过
 3. [ ] 魔搭社区部署（smart_tool.json 已就绪，需更新 entry_point）
 
 ### 本周完成

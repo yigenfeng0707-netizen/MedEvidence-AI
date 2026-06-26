@@ -34,7 +34,7 @@ class SearchService:
         """
         start_time = time.time()
         
-        # 1. 调用KnowS API检索
+        # 1. 调用KnowS API检索（返回已解析的 LiteratureResult 对象列表 + question_id）
         knows_result = await self.knows_client.search(
             query=request.query,
             max_results=request.max_results,
@@ -43,15 +43,11 @@ class SearchService:
             evidence_levels=[e.value for e in request.evidence_levels] if request.evidence_levels else None
         )
         
-        # 2. 解析结果
-        results: List[LiteratureResult] = []
+        # 2. 结果整理与分布统计
+        results: List[LiteratureResult] = knows_result.get("results", [])
         evidence_distribution: Dict[str, int] = {}
         
-        for item in knows_result.get("results", []):
-            lit = self.knows_client._parse_literature(item)
-            results.append(lit)
-            
-            # 统计证据等级分布
+        for lit in results:
             level = lit.evidence_info.level.value
             evidence_distribution[level] = evidence_distribution.get(level, 0) + 1
         
