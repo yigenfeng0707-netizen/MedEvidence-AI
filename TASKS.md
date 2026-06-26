@@ -69,8 +69,8 @@
 ### 阶段2：MVP开发（6/25-7/1）
 - [x] ~~KnowS API 权限开通~~ — 实际为端点路径错误，已修正为 `ai_search_paper_en`
 - [x] 真实 API 端到端联调（6/27 通过，KnowS + StepFun 全链路接通）
-- [ ] 魔搭社区部署
-- [ ] smart_tool.json 的 entry_point 更新为魔搭线上地址
+- [ ] 魔搭社区部署（配置文件就绪，待在魔搭平台操作）
+- [ ] smart_tool.json 的 entry_point 更新为魔搭线上地址（部署后替换）
 
 ---
 
@@ -134,7 +134,8 @@
 ### 今天/明天必须完成
 1. [x] ~~联系 KnowS 平台开通 API 访问权限~~ — 实际为端点路径错误，已修正并打通
 2. [x] ~~真实 API 端到端联调~~ — 6/27 已通过
-3. [ ] 魔搭社区部署（smart_tool.json 已就绪，需更新 entry_point）
+3. [ ] 在魔搭平台创建并部署 Skill（配置文件已就绪，见 DEPLOY_TO_MODELSCOPE.md）
+4. [ ] smart_tool.json 的 entry_point 更新为魔搭线上地址并推送
 
 ### 本周完成
 4. [ ] 录制演示视频
