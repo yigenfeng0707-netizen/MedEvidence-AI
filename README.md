@@ -67,7 +67,7 @@
 
 ```bash
 # 克隆仓库
-git clone https://github.com/your-username/MedEvidence-AI.git
+git clone https://github.com/yigenfeng0707-netizen/MedEvidence-AI.git
 cd MedEvidence-AI
 
 # 创建虚拟环境
@@ -232,7 +232,7 @@ uvicorn src.main:app --reload --port 8000
 
 - 📧 Email: [your-email@example.com]
 - 💬 微信/Discord: [联系方式]
-- 🐛 Issue反馈: https://github.com/your-username/MedEvidence-AI/issues
+- 🐛 Issue反馈: https://github.com/yigenfeng0707-netizen/MedEvidence-AI/issues
 
 ### 引用本项目
 
@@ -243,7 +243,7 @@ uvicorn src.main:app --reload --port 8000
   title = {MedEvidence AI: Medical Evidence-Based Intelligent Search Skill},
   author = {[Your Name]},
   year = {2026},
-  url = {https://github.com/your-username/MedEvidence-AI}
+  url = {https://github.com/yigenfeng0707-netizen/MedEvidence-AI}
 }
 ```
 
@@ -253,7 +253,7 @@ uvicorn src.main:app --reload --port 8000
 
 **⭐ 如果本项目对您有帮助，请给我们一个Star！**
 
-[GitHub Stars](https://github.com/your-username/MedEvidence-AI) | [问题反馈](https://github.com/your-username/MedEvidence-AI/issues)
+[GitHub Stars](https://github.com/yigenfeng0707-netizen/MedEvidence-AI) | [问题反馈](https://github.com/yigenfeng0707-netizen/MedEvidence-AI/issues)
 
 ---
 
