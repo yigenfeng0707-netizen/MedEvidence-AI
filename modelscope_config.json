@@ -1,21 +1,26 @@
 {
   "name": "medevidence-ai",
   "display_name": "医学循证检索助手",
-  "description": "基于KnowS医学循证API的智能检索工具，支持PubMed文献检索、循证分级标注、智能摘要生成。帮助医生、医学生快速获取高质量医学证据。",
+  "description": "基于KnowS医学循证API的智能检索Skill，支持PubMed文献检索、循证分级标注、智能摘要生成和引用格式化导出。用AI助力医学研究，让循证医学触手可及。",
   "icon": "🩺",
   "category": "medical",
+  "version": "1.0.0",
+  "license": "Apache-2.0",
+  "tags": ["医疗", "医学文献", "循证医学", "PubMed", "文献检索"],
+  "author": {
+    "name": "yigenfeng0707-netizen",
+    "github": "https://github.com/yigenfeng0707-netizen"
+  },
   "source": {
     "type": "github",
     "url": "https://github.com/yigenfeng0707-netizen/MedEvidence-AI",
-    "branch": "main",
+    "branch": "master",
     "python_version": "3.11"
   },
-  "startup_command": "python src/main.py",
+  "startup_command": "uvicorn src.main:app --host 0.0.0.0 --port 8000",
   "port": 8000,
   "environment_variables": {
-    "KNOWS_API_KEY": "sk-knows-aWsL8pr0PkN88F9JlqUWzKYuwkxFw5mi",
-    "STEPFUN_API_KEY": "2XDrgYOtH3z0nnv1LoYQXD6AowAwCPwY1rZuMw6AWZES1mej4SH9MElA5wvHa4zKJ",
-    "STEPFUN_MODEL": "step-1-flash",
+    "STEPFUN_MODEL": "step-2-16k",
     "STEPFUN_API_BASE": "https://api.stepfun.com/v1",
     "KNOWS_API_BASE": "https://api.nullht.com/v1",
     "DEBUG": "false",
@@ -23,6 +28,10 @@
     "CACHE_ENABLED": "true",
     "CACHE_TTL": "3600",
     "LOG_LEVEL": "INFO"
+  },
+  "secrets": {
+    "KNOWS_API_KEY": "在魔搭平台手动配置 - KnowS医学循证API密钥",
+    "STEPFUN_API_KEY": "在魔搭平台手动配置 - 阶跃星辰StepFun大模型API密钥"
   },
   "health_check": {
     "path": "/health",
@@ -32,23 +41,16 @@
     {
       "path": "/api/v1/search",
       "method": "POST",
-      "description": "医学文献检索"
+      "description": "医学文献检索（支持循证分级、智能摘要、临床要点）"
     },
     {
       "path": "/api/v1/search/quick",
       "method": "POST",
-      "description": "快速检索"
+      "description": "快速检索（简化版）"
     }
   ],
   "resources": {
     "cpu": "2",
     "memory": "4Gi"
-  },
-  "author": {
-    "name": "yigenfeng0707-netizen",
-    "github": "https://github.com/yigenfeng0707-netizen"
-  },
-  "license": "Apache-2.0",
-  "version": "1.0.0",
-  "tags": ["医疗", "医学文献", "循证医学", "PubMed", "文献检索"]
+  }
 }
