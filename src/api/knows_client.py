@@ -83,9 +83,16 @@ class KnowsClient:
                 resp = await self.client.post(endpoint, json={"query": search_query, "limit": limit})
                 resp.raise_for_status()
                 data = resp.json()
+                if not isinstance(data, dict):
+                    return
                 if not question_id:
                     question_id = data.get("question_id", "")
-                for ev in data.get("evidences", []):
+                evidences = data.get("evidences")
+                if not isinstance(evidences, list):
+                    return
+                for ev in evidences:
+                    if not isinstance(ev, dict):
+                        continue
                     title = (ev.get("title") or "").strip()
                     if not title or title in seen_titles:
                         continue
@@ -160,7 +167,7 @@ class KnowsClient:
 
         cn_meta_keywords = ["meta分析", "荟萃分析", "系统评价", "系统综述", "meta 分析"]
         en_meta_keywords = ["meta-analysis", "meta analysis", "systematic review", "systematic overview", "evidence map", "evidence mapping"]
-        if any(kw in title for kw in cn_meta_keywords) or any(kw in title_lower for kw in en_meta_keywords) or \
+        if any(kw in title_lower for kw in cn_meta_keywords) or any(kw in title_lower for kw in en_meta_keywords) or \
            "meta" in study_type or "meta分析" in study_type_raw:
             return EvidenceInfo(
                 level=EvidenceLevel.LEVEL_1_META,
@@ -170,7 +177,7 @@ class KnowsClient:
 
         cn_guide_keywords = ["指南", "共识", "规范"]
         en_guide_keywords = ["clinical practice guideline", "practice guideline", "consensus statement", "clinical guideline"]
-        if any(kw in title for kw in cn_guide_keywords) or any(kw in title_lower for kw in en_guide_keywords):
+        if any(kw in title_lower for kw in cn_guide_keywords) or any(kw in title_lower for kw in en_guide_keywords):
             return EvidenceInfo(
                 level=EvidenceLevel.LEVEL_4_EXPERT,
                 study_type="临床指南/专家共识"
@@ -178,7 +185,7 @@ class KnowsClient:
 
         cn_rct_keywords = ["随机对照", "随机双盲", "随机试验", "rct研究"]
         en_rct_keywords = ["randomized controlled", "randomised controlled", "randomized trial", "randomised trial", "rct"]
-        if any(kw in title for kw in cn_rct_keywords) or any(kw in title_lower for kw in en_rct_keywords) or \
+        if any(kw in title_lower for kw in cn_rct_keywords) or any(kw in title_lower for kw in en_rct_keywords) or \
            "randomized" in study_type or "rct" in study_type or "随机对照" in study_type_raw:
             return EvidenceInfo(
                 level=EvidenceLevel.LEVEL_1_RCT,
