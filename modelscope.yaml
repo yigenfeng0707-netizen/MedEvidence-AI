@@ -1,0 +1,63 @@
+name: medevidence-ai
+display_name: 医学循证检索助手
+description: 基于KnowS医学循证API的智能检索工具，支持PubMed文献检索、循证分级标注、智能摘要生成和引用格式化导出。帮助医生、医学生快速获取高质量医学证据。
+icon: 🩺
+version: 1.0.0
+author: yigenfeng0707-netizen
+license: Apache-2.0
+category: medical
+tags:
+  - 医疗
+  - 医学文献
+  - 循证医学
+  - PubMed
+  - 文献检索
+
+source:
+  type: github
+  url: https://github.com/yigenfeng0707-netizen/MedEvidence-AI
+  branch: master
+
+runtime:
+  command: uvicorn src.main:app --host 0.0.0.0 --port 8000
+  python_version: "3.11"
+  port: 8000
+
+environment_variables:
+  - name: KNOWS_API_KEY
+    description: KnowS医学循证API密钥，在 https://developers.nullht.com/ 申请
+  - name: STEPFUN_API_KEY
+    description: 阶跃星辰StepFun大模型API密钥，在 https://platform.stepfun.com/ 申请
+  - name: STEPFUN_MODEL
+    value: step-2-16k
+    description: StepFun模型名，可选 step-1-8k, step-1-32k, step-2-16k, step-2-mini, step-3.5-flash
+  - name: STEPFUN_API_BASE
+    value: https://api.stepfun.com/v1
+  - name: KNOWS_API_BASE
+    value: https://api.nullht.com/v1
+  - name: PORT
+    value: "8000"
+  - name: DEBUG
+    value: "false"
+  - name: CACHE_ENABLED
+    value: "true"
+  - name: CACHE_TTL
+    value: "3600"
+  - name: LOG_LEVEL
+    value: INFO
+
+health_check:
+  path: /health
+  method: GET
+
+endpoints:
+  - path: /api/v1/search
+    method: POST
+    description: 医学文献检索（支持循证分级、智能摘要）
+  - path: /api/v1/search/quick
+    method: POST
+    description: 快速检索（简化版）
+
+resources:
+  cpu: "2"
+  memory: "4Gi"

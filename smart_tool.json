@@ -1,0 +1,114 @@
+{
+  "name": "medevidence-ai",
+  "display_name": "医学循证检索助手",
+  "description": "基于KnowS医学循证API的智能检索Skill，支持PubMed文献检索、循证分级标注、智能摘要生成和引用格式化导出。用AI助力医学研究，让循证医学触手可及。",
+  "icon": "🩺",
+  "tags": ["医疗", "医学文献", "循证医学", "PubMed", "文献检索"],
+  "parameters": [
+    {
+      "name": "query",
+      "type": "string",
+      "description": "检索查询内容，支持中文或英文描述疾病、症状、药物等医学主题",
+      "required": true,
+      "default": ""
+    },
+    {
+      "name": "max_results",
+      "type": "integer",
+      "description": "最大返回结果数（1-50）",
+      "required": false,
+      "default": 10
+    },
+    {
+      "name": "evidence_levels",
+      "type": "array",
+      "description": "筛选的证据等级，可选值：Level 1 - Meta分析、Level 1 - 随机对照试验、Level 2 - 队列研究、Level 2 - 病例对照研究",
+      "required": false,
+      "default": []
+    },
+    {
+      "name": "year_from",
+      "type": "integer",
+      "description": "起始年份（筛选该年份之后的文献）",
+      "required": false,
+      "default": null
+    },
+    {
+      "name": "year_to",
+      "type": "integer",
+      "description": "截止年份（筛选该年份之前的文献）",
+      "required": false,
+      "default": null
+    },
+    {
+      "name": "generate_summary",
+      "type": "boolean",
+      "description": "是否生成智能摘要和临床要点",
+      "required": false,
+      "default": true
+    }
+  ],
+  "entry_point": "http://localhost:8000/api/v1/search",
+  "method": "POST",
+  "headers": {
+    "Content-Type": "application/json"
+  },
+  "response_format": "json",
+  "example": {
+    "input": {
+      "query": "SGLT2 inhibitors renal protection type 2 diabetes",
+      "max_results": 5,
+      "generate_summary": true
+    },
+    "output": {
+      "query": "SGLT2 inhibitors renal protection type 2 diabetes",
+      "original_query": "SGLT2 inhibitors renal protection type 2 diabetes",
+      "results_count": 5,
+      "evidence_distribution": {
+        "Level 1 - Meta分析": 2,
+        "Level 1 - 随机对照试验": 1,
+        "Level 2 - 队列研究": 2
+      },
+      "results": [
+        {
+          "pmid": "12345678",
+          "title": "SGLT2 inhibitors for primary and secondary prevention...",
+          "title_zh": "SGLT2抑制剂用于心血管和肾脏结局的一级和二级预防",
+          "journal": "The Lancet",
+          "year": 2025,
+          "evidence_info": {
+            "level": "Level 1 - Meta分析",
+            "study_type": "Meta分析",
+            "sample_size": "45,000"
+          },
+          "clinical_significance": "强推荐：对于eGFR≥30的2型糖尿病患者，建议使用SGLT2抑制剂以保护肾功能。"
+        }
+      ],
+      "summary": "当前证据显示SGLT2抑制剂对2型糖尿病患者具有显著肾脏保护作用...",
+      "clinical_takeaway": "推荐等级：强。对于合并糖尿病肾病的患者，推荐优先使用SGLT2抑制剂。",
+      "search_time_ms": 2850,
+      "cached": false
+    }
+  },
+  "limitations": [
+    "本工具仅检索公开学术文献，不构成诊断或治疗建议",
+    "AI生成的中文摘要和临床要点仅供参考，建议对照原文阅读",
+    "循证分级基于自动化判断，可能与人工专家判断存在差异",
+    "临床决策应基于患者具体情况和专业医生判断"
+  ],
+  "compliance": {
+    "medical_disclaimer": "本Skill提供的文献摘要和循证信息仅供医学专业人士参考，不构成诊断或治疗建议。临床决策应基于患者的具体情况、专业医生的判断和最新的临床指南。",
+    "data_source": "KnowS医学循证数据库、PubMed公开文献库",
+    "no_patient_data": true,
+    "no_diagnosis": true
+  },
+  "author": {
+    "name": "MedEvidence Team",
+    "contact": "medevidence@example.com",
+    "organization": "小X宝开源医疗黑客松参赛项目"
+  },
+  "license": "Apache-2.0",
+  "github_url": "https://github.com/yigenfeng0707-netizen/MedEvidence-AI",
+  "version": "1.0.0",
+  "created_at": "2026-06-25"
+}
