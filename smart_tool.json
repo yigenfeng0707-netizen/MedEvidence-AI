@@ -48,7 +48,7 @@
       "default": true
     }
   ],
-  "entry_point": "http://localhost:8000/api/v1/search",
+  "entry_point": "https://gsym236998-medevidence-ai.ms.show/api/v1/search",
   "method": "POST",
   "headers": {
     "Content-Type": "application/json"

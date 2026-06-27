@@ -4,28 +4,4 @@ pydantic>=2.0.0
 pydantic-settings>=2.1.0
 httpx>=0.26.0
 python-dotenv>=1.0.0
-
-# KnowS API客户端
-# 请访问 https://developers.nullht.com/ 申请API Key
-
-# StepFun API客户端
-openai>=1.12.0  # StepFun API兼容OpenAI格式
-
-# 向量检索（可选，用于RAG增强）
-faiss-cpu>=1.7.4
-numpy>=1.24.0
-sentence-transformers>=2.3.0
-
-# 工具库
-python-multipart>=0.0.9
-jinja2>=3.1.0
-markdown>=3.5.0
-
-# 测试依赖
-pytest>=8.0.0
-pytest-asyncio>=0.23.0
-httpx>=0.26.0
-
-# 文档生成
-mkdocs>=1.5.0
-mkdocs-material>=9.5.0
+openai>=1.12.0
