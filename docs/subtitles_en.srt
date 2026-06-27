@@ -1,0 +1,199 @@
+1
+00:00:00,500 --> 00:00:04,000
+In medical research, evidence is the foundation.
+
+2
+00:00:04,200 --> 00:00:09,000
+MedEvidence AI — Your intelligent evidence-based medicine search assistant.
+
+3
+00:00:12,500 --> 00:00:16,500
+Clinical decisions require evidence-based support.
+
+4
+00:00:16,800 --> 00:00:21,000
+But facing massive medical literature, have you ever wondered —
+
+5
+00:00:21,500 --> 00:00:25,000
+How to classify evidence levels?
+
+6
+00:00:25,500 --> 00:00:29,000
+How to quickly search Chinese and English literature?
+
+7
+00:00:29,500 --> 00:00:33,000
+Where are the high-quality studies?
+
+8
+00:00:35,500 --> 00:00:40,000
+MedEvidence AI, powered by KnowS evidence-based database
+
+9
+00:00:40,500 --> 00:00:44,500
+and StepFun large language model, provides you with
+
+10
+00:00:44,800 --> 00:00:49,000
+Bilingual intelligent literature search,
+
+11
+00:00:49,500 --> 00:00:53,000
+5-level evidence grading,
+
+12
+00:00:53,200 --> 00:00:58,000
+and one-stop AI-generated clinical summaries.
+
+13
+00:00:50,500 --> 00:00:54,000
+Let's try a Chinese search.
+
+14
+00:00:54,500 --> 00:00:58,500
+Enter "Meta分析 抗生素" (Meta-analysis antibiotics),
+
+15
+00:00:59,000 --> 00:01:03,000
+the system automatically calls the Chinese literature database,
+
+16
+00:01:03,500 --> 00:01:07,000
+returning the most relevant research results.
+
+17
+00:01:07,500 --> 00:01:12,000
+As you can see, all 5 results are accurately identified as Level 1
+
+18
+00:01:12,500 --> 00:01:16,500
+— Meta-analysis or systematic review,
+
+19
+00:01:17,000 --> 00:01:21,500
+the highest level of evidence in evidence-based medicine.
+
+20
+00:01:22,000 --> 00:01:27,000
+No more manual study type classification —
+
+21
+00:01:27,500 --> 00:01:30,000
+the system does it for you.
+
+22
+00:01:30,500 --> 00:01:34,500
+English search is equally precise.
+
+23
+00:01:35,000 --> 00:01:39,500
+Search "COVID-19 vaccine randomized trial",
+
+24
+00:01:40,000 --> 00:01:44,500
+the system returns multiple high-quality RCTs,
+
+25
+00:01:45,000 --> 00:01:49,000
+all marked as Level 1.
+
+26
+00:01:49,500 --> 00:01:54,000
+Each paper includes journal name, impact factor,
+
+27
+00:01:54,500 --> 00:01:58,500
+DOI, publication date, and more,
+
+28
+00:01:59,000 --> 00:02:03,500
+helping you quickly assess quality and access the full text.
+
+29
+00:02:05,500 --> 00:02:09,000
+What is the 5-level evidence grading system?
+
+30
+00:02:09,500 --> 00:02:13,000
+From Level 5: case reports and expert opinions,
+
+31
+00:02:13,500 --> 00:02:17,500
+to Level 4: case series and clinical guidelines,
+
+32
+00:02:18,000 --> 00:02:22,000
+Level 3: cohort and case-control studies,
+
+33
+00:02:22,500 --> 00:02:26,500
+then Level 2: lower-quality randomized controlled trials,
+
+34
+00:02:27,000 --> 00:02:30,500
+and the highest Level 1
+
+35
+00:02:30,800 --> 00:02:34,000
+— Meta-analysis and high-quality RCTs.
+
+36
+00:02:34,500 --> 00:02:38,000
+Higher evidence level means more reliable results.
+
+37
+00:02:40,500 --> 00:02:44,500
+Technically, MedEvidence AI is built on FastAPI,
+
+38
+00:02:45,000 --> 00:02:49,500
+deeply integrated with KnowS evidence-based database
+
+39
+00:02:50,000 --> 00:02:53,000
+and StepFun large language model.
+
+40
+00:02:53,500 --> 00:02:57,500
+Supports one-click deployment on ModelScope,
+
+41
+00:02:58,000 --> 00:03:01,000
+Docker container deployment,
+
+42
+00:03:01,500 --> 00:03:04,000
+and local execution — fully open source.
+
+43
+00:03:05,500 --> 00:03:09,000
+We prioritize medical safety and compliance.
+
+44
+00:03:09,500 --> 00:03:13,000
+This tool does not use real patient data,
+
+45
+00:03:13,500 --> 00:03:16,500
+does not provide diagnostic advice,
+
+46
+00:03:17,000 --> 00:03:20,000
+and is for medical research and learning only.
+
+47
+00:03:20,500 --> 00:03:24,000
+Please follow medical advice for clinical decisions.
+
+48
+00:03:24,500 --> 00:03:28,000
+MedEvidence AI,
+
+49
+00:03:28,500 --> 00:03:32,500
+illuminating every corner of medical research with AI.
+
+50
+00:03:33,000 --> 00:03:37,000
+Try it now and start your intelligent evidence journey.

@@ -6,6 +6,24 @@
 
 ---
 
+## 🚀 快速开始
+
+| 方式 | 链接 |
+|------|------|
+| 🔗 **在线体验** | [魔搭创空间](https://www.modelscope.cn/studios/gsym236998/MedEvidence-AI) |
+| 📖 **API文档** | [在线Swagger](https://gsym236998-medevidence-ai.ms.show/docs) |
+| 💻 **源代码** | [GitHub仓库](https://github.com/yigenfeng0707-netizen/MedEvidence-AI) |
+| 🎬 **演示视频** | [B站](https://www.bilibili.com/)（上传中） |
+
+**快速测试：**
+```bash
+curl -X POST https://gsym236998-medevidence-ai.ms.show/api/v1/search \
+  -H "Content-Type: application/json" \
+  -d '{"query":"Meta分析 抗生素","max_results":5,"generate_summary":false}'
+```
+
+---
+
 ## 1. 项目简介与医疗场景
 
 ### 解决的痛点
@@ -54,7 +72,7 @@
 
 ### 魔搭展示链接
 
-> 🚀 **在线体验**：https://modelscope.cn/skills/MedEvidence-AI (待发布后更新)
+> 🚀 **在线体验**：https://www.modelscope.cn/studios/gsym236998/MedEvidence-AI
 
 ### 本地运行步骤
 
@@ -179,7 +197,11 @@ uvicorn src.main:app --reload --port 8000
 
 ### 演示视频
 
-📺 **完整演示视频**：[Bilibili/YouTube链接] (待上传)
+📺 **完整演示视频**：[B站链接](https://www.bilibili.com/) (待上传)
+   - 时长：约 3 分 20 秒
+   - 内容：产品介绍 + 中英文检索演示 + 证据分级体系 + 技术架构
+
+> 演示视频逐字稿和素材见 [docs/VIDEO_SCRIPT.md](docs/VIDEO_SCRIPT.md)
 
 ---
 
