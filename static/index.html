@@ -542,14 +542,15 @@
             const resultsCount = document.getElementById('resultsCount');
 
             const results = data.results || [];
-            const total = data.total || results.length;
+            const total = data.results_count || results.length;
 
             document.getElementById('totalResults').textContent = total;
             document.getElementById('responseTime').textContent = responseTime;
 
-            const highEvidenceCount = results.filter(r => 
-                r.evidence_level === 'I' || r.evidence_level === 'II' || r.evidence_level === '高'
-            ).length;
+            const highEvidenceCount = results.filter(r => {
+                const level = r.evidence_info?.level || r.evidence_level || '';
+                return level.includes('I') || level.includes('II') || level.includes('高');
+            }).length;
             document.getElementById('highEvidence').textContent = highEvidenceCount;
 
             statsSection.style.display = 'grid';
@@ -616,20 +617,21 @@
         }
 
         function renderResultCard(result) {
-            const evidenceClass = getEvidenceClass(result.evidence_level);
-            const title = result.title || '无标题';
-            const authors = result.authors || '';
+            const evidenceLevel = result.evidence_info?.level || result.evidence_level || '';
+            const evidenceClass = getEvidenceClass(evidenceLevel);
+            const title = result.title || result.title_zh || '无标题';
+            const authors = Array.isArray(result.authors) ? result.authors.map(a => a.name).join(', ') : '';
             const journal = result.journal || '';
             const year = result.year || '';
-            const abstract = result.abstract || '暂无摘要';
-            const studyType = result.study_type || '';
+            const abstract = result.abstract_zh || result.abstract || '暂无摘要';
+            const studyType = result.evidence_info?.study_type || result.study_type || '';
 
             return `
                 <div class="result-card">
                     <div class="result-header">
                         <div class="result-title">${title}</div>
                         <span class="evidence-badge ${evidenceClass}">
-                            ${result.evidence_level || '未分级'}
+                            ${evidenceLevel || '未分级'}
                         </span>
                     </div>
                     <div class="result-meta">

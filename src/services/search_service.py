@@ -5,8 +5,6 @@
 import time
 import logging
 from typing import List, Dict, Any, Optional
-from ..api.knows_client import KnowsClient
-from ..api.stepfun_client import StepFunClient
 from ..models.schemas import QueryRequest, SearchResponse, LiteratureResult
 from ..utils.cache import cache
 
@@ -17,13 +15,28 @@ class SearchService:
     """检索服务"""
     
     def __init__(self):
-        self.knows_client: Optional[KnowsClient] = None
-        self.stepfun_client: Optional[StepFunClient] = None
+        self.knows_client = None
+        self.stepfun_client = None
     
     async def initialize(self):
-        """初始化API客户端"""
-        self.knows_client = KnowsClient()
-        self.stepfun_client = StepFunClient()
+        """初始化API客户端，支持mock模式降级"""
+        try:
+            from ..api.knows_client import KnowsClient
+            self.knows_client = KnowsClient()
+            logger.info("KnowS API客户端初始化成功")
+        except Exception as e:
+            logger.warning(f"KnowS API初始化失败，使用mock模式: {e}")
+            from ..api.knows_client_mock import KnowsClientMock
+            self.knows_client = KnowsClientMock()
+        
+        try:
+            from ..api.stepfun_client import StepFunClient
+            self.stepfun_client = StepFunClient()
+            logger.info("StepFun API客户端初始化成功")
+        except Exception as e:
+            logger.warning(f"StepFun API初始化失败，使用mock模式: {e}")
+            from ..api.stepfun_client_mock import StepFunClientMock
+            self.stepfun_client = StepFunClientMock()
     
     async def search(self, request: QueryRequest) -> SearchResponse:
         """
