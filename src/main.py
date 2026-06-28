@@ -13,7 +13,9 @@ from typing import Dict
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, FileResponse
+from fastapi.staticfiles import StaticFiles
+import os
 
 from .models.schemas import (
     QueryRequest, SearchResponse, 
@@ -53,6 +55,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# 挂载静态文件目录
+static_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "static")
+if os.path.exists(static_dir):
+    app.mount("/static", StaticFiles(directory=static_dir), name="static")
+
 
 # 全局异常处理
 @app.exception_handler(Exception)
@@ -68,9 +75,12 @@ async def global_exception_handler(request: Request, exc: Exception):
     )
 
 
-@app.get("/", response_model=Dict[str, str])
+@app.get("/")
 async def root():
-    """根路径"""
+    """根路径 - 返回前端页面"""
+    index_path = os.path.join(static_dir, "index.html")
+    if os.path.exists(index_path):
+        return FileResponse(index_path)
     return {
         "name": "MedEvidence AI",
         "version": "1.0.0",

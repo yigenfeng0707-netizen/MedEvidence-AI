@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MedEvidence AI - 医学循证智能检索助手</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            padding: 40px 20px;
+            color: white;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+
+        header p {
+            font-size: 1.1rem;
+            opacity: 0.95;
+        }
+
+        .search-section {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            margin-bottom: 30px;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 14px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .search-btn {
+            padding: 14px 32px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .search-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .search-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .filters {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .filter-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .filter-item label {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .filter-item select,
+        .filter-item input {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .stats-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 14px;
+            margin-top: 4px;
+        }
+
+        .results-section {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .results-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+
+        .results-count {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid #f0f0f0;
+            border-top-color: #667eea;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 16px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .result-card {
+            border: 1px solid #eee;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .result-card:hover {
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            transform: translateY(-2px);
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .result-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #333;
+            line-height: 1.5;
+        }
+
+        .evidence-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .evidence-high {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .evidence-moderate {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .evidence-low {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .result-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 12px;
+            font-size: 13px;
+            color: #666;
+        }
+
+        .result-authors {
+            color: #555;
+        }
+
+        .result-journal {
+            font-style: italic;
+            color: #666;
+        }
+
+        .result-year {
+            color: #888;
+        }
+
+        .result-abstract {
+            color: #555;
+            line-height: 1.7;
+            font-size: 14px;
+        }
+
+        .summary-section {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf3 100%);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 24px;
+        }
+
+        .summary-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .summary-content {
+            line-height: 1.8;
+            color: #444;
+        }
+
+        .clinical-takeaway {
+            background: #e8f5e9;
+            border-left: 4px solid #4caf50;
+            padding: 16px;
+            margin-top: 12px;
+            border-radius: 0 6px 6px 0;
+        }
+
+        .clinical-takeaway-title {
+            font-weight: 600;
+            color: #2e7d32;
+            margin-bottom: 8px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+
+        .empty-icon {
+            font-size: 3rem;
+            margin-bottom: 16px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 30px 20px;
+            color: rgba(255,255,255,0.8);
+            font-size: 14px;
+        }
+
+        footer a {
+            color: white;
+            text-decoration: underline;
+        }
+
+        .chart-container {
+            margin-bottom: 24px;
+            padding: 20px;
+            background: #fafafa;
+            border-radius: 10px;
+        }
+
+        .chart-title {
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #333;
+        }
+
+        .chart-bars {
+            display: flex;
+            gap: 20px;
+            align-items: flex-end;
+            height: 150px;
+        }
+
+        .chart-bar-group {
+            flex: 1;
+            text-align: center;
+        }
+
+        .chart-bar {
+            background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+            border-radius: 6px 6px 0 0;
+            transition: all 0.3s ease;
+            min-height: 4px;
+        }
+
+        .chart-bar-label {
+            margin-top: 8px;
+            font-size: 12px;
+            color: #666;
+        }
+
+        .chart-bar-value {
+            font-size: 12px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 4px;
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 1.8rem;
+            }
+
+            .search-box {
+                flex-direction: column;
+            }
+
+            .search-btn {
+                width: 100%;
+            }
+
+            .stats-section {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔬 MedEvidence AI</h1>
+            <p>医学循证智能检索助手 - 用AI照亮医学研究的每一个角落</p>
+        </header>
+
+        <div class="search-section">
+            <div class="search-box">
+                <input 
+                    type="text" 
+                    id="queryInput" 
+                    class="search-input" 
+                    placeholder="输入医学问题，例如：高血压治疗、糖尿病管理..."
+                    onkeypress="if(event.key==='Enter') search()"
+                >
+                <button class="search-btn" id="searchBtn" onclick="search()">
+                    🔍 智能检索
+                </button>
+            </div>
+            <div class="filters">
+                <div class="filter-item">
+                    <label>结果数量:</label>
+                    <select id="maxResults">
+                        <option value="5">5 条</option>
+                        <option value="10" selected>10 条</option>
+                        <option value="20">20 条</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>
+                        <input type="checkbox" id="generateSummary" checked>
+                        智能摘要
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <div id="statsSection" class="stats-section" style="display: none;">
+            <div class="stat-card">
+                <div class="stat-number" id="totalResults">0</div>
+                <div class="stat-label">检索结果</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="highEvidence">0</div>
+                <div class="stat-label">高证据等级</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="responseTime">0</div>
+                <div class="stat-label">响应时间(秒)</div>
+            </div>
+        </div>
+
+        <div class="results-section">
+            <div class="results-header">
+                <div class="results-title">📚 检索结果</div>
+                <div class="results-count" id="resultsCount"></div>
+            </div>
+
+            <div id="resultsContent">
+                <div class="empty-state">
+                    <div class="empty-icon">🔍</div>
+                    <p>输入医学问题，开始智能检索</p>
+                    <p style="font-size: 13px; margin-top: 8px;">支持中英文查询，自动证据等级判定，智能摘要生成</p>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>MedEvidence AI v1.0.0 | 基于 KnowS API + StepFun 大模型</p>
+            <p style="margin-top: 8px;">
+                <a href="/docs" target="_blank">API 文档</a> | 
+                <a href="/health" target="_blank">健康检查</a>
+            </p>
+        </footer>
+    </div>
+
+    <script>
+        let startTime = 0;
+
+        async function search() {
+            const query = document.getElementById('queryInput').value.trim();
+            if (!query) {
+                alert('请输入检索关键词');
+                return;
+            }
+
+            const maxResults = parseInt(document.getElementById('maxResults').value);
+            const generateSummary = document.getElementById('generateSummary').checked;
+            const searchBtn = document.getElementById('searchBtn');
+            const resultsContent = document.getElementById('resultsContent');
+            const statsSection = document.getElementById('statsSection');
+
+            searchBtn.disabled = true;
+            searchBtn.textContent = '检索中...';
+            startTime = Date.now();
+
+            resultsContent.innerHTML = `
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p>正在检索医学文献，请稍候...</p>
+                </div>
+            `;
+
+            try {
+                const response = await fetch('/api/v1/search', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        query: query,
+                        max_results: maxResults,
+                        generate_summary: generateSummary
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error('检索失败');
+                }
+
+                const data = await response.json();
+                displayResults(data);
+            } catch (error) {
+                resultsContent.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">⚠️</div>
+                        <p>检索失败: ${error.message}</p>
+                        <p style="font-size: 13px; margin-top: 8px;">请检查 API 服务是否正常运行</p>
+                    </div>
+                `;
+                statsSection.style.display = 'none';
+            } finally {
+                searchBtn.disabled = false;
+                searchBtn.textContent = '🔍 智能检索';
+            }
+        }
+
+        function displayResults(data) {
+            const responseTime = ((Date.now() - startTime) / 1000).toFixed(1);
+            const resultsContent = document.getElementById('resultsContent');
+            const statsSection = document.getElementById('statsSection');
+            const resultsCount = document.getElementById('resultsCount');
+
+            const results = data.results || [];
+            const total = data.total || results.length;
+
+            document.getElementById('totalResults').textContent = total;
+            document.getElementById('responseTime').textContent = responseTime;
+
+            const highEvidenceCount = results.filter(r => 
+                r.evidence_level === 'I' || r.evidence_level === 'II' || r.evidence_level === '高'
+            ).length;
+            document.getElementById('highEvidence').textContent = highEvidenceCount;
+
+            statsSection.style.display = 'grid';
+            resultsCount.textContent = `共 ${total} 条结果，耗时 ${responseTime} 秒`;
+
+            let html = '';
+
+            if (data.summary) {
+                html += `
+                    <div class="summary-section">
+                        <div class="summary-title">📝 智能摘要</div>
+                        <div class="summary-content">${formatText(data.summary)}</div>
+                        ${data.clinical_takeaway ? `
+                            <div class="clinical-takeaway">
+                                <div class="clinical-takeaway-title">💡 临床要点</div>
+                                <div>${formatText(data.clinical_takeaway)}</div>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            }
+
+            if (data.evidence_distribution) {
+                html += renderChart(data.evidence_distribution);
+            }
+
+            if (results.length === 0) {
+                html += `
+                    <div class="empty-state">
+                        <div class="empty-icon">📭</div>
+                        <p>未找到相关文献</p>
+                    </div>
+                `;
+            } else {
+                results.forEach(result => {
+                    html += renderResultCard(result);
+                });
+            }
+
+            resultsContent.innerHTML = html;
+        }
+
+        function renderChart(distribution) {
+            const entries = Object.entries(distribution);
+            const max = Math.max(...entries.map(([_, v]) => v), 1);
+
+            let barsHtml = entries.map(([level, count]) => {
+                const height = (count / max) * 100;
+                return `
+                    <div class="chart-bar-group">
+                        <div class="chart-bar-value">${count}</div>
+                        <div class="chart-bar" style="height: ${height}%;"></div>
+                        <div class="chart-bar-label">${level}</div>
+                    </div>
+                `;
+            }).join('');
+
+            return `
+                <div class="chart-container">
+                    <div class="chart-title">📊 证据等级分布</div>
+                    <div class="chart-bars">${barsHtml}</div>
+                </div>
+            `;
+        }
+
+        function renderResultCard(result) {
+            const evidenceClass = getEvidenceClass(result.evidence_level);
+            const title = result.title || '无标题';
+            const authors = result.authors || '';
+            const journal = result.journal || '';
+            const year = result.year || '';
+            const abstract = result.abstract || '暂无摘要';
+            const studyType = result.study_type || '';
+
+            return `
+                <div class="result-card">
+                    <div class="result-header">
+                        <div class="result-title">${title}</div>
+                        <span class="evidence-badge ${evidenceClass}">
+                            ${result.evidence_level || '未分级'}
+                        </span>
+                    </div>
+                    <div class="result-meta">
+                        ${authors ? `<span class="result-authors">${authors}</span>` : ''}
+                        ${journal ? `<span class="result-journal">${journal}</span>` : ''}
+                        ${year ? `<span class="result-year">${year}</span>` : ''}
+                        ${studyType ? `<span>📋 ${studyType}</span>` : ''}
+                        ${result.doi ? `<span>DOI: ${result.doi}</span>` : ''}
+                    </div>
+                    <div class="result-abstract">${formatText(abstract)}</div>
+                    ${result.pmid ? `<div style="margin-top: 10px; font-size: 13px; color: #666;">PMID: ${result.pmid}</div>` : ''}
+                </div>
+            `;
+        }
+
+        function getEvidenceClass(level) {
+            if (!level) return 'evidence-low';
+            const l = level.toLowerCase();
+            if (l.includes('i') || l.includes('高') || l.includes('a') || l.includes('1')) {
+                return 'evidence-high';
+            } else if (l.includes('ii') || l.includes('中') || l.includes('b') || l.includes('2')) {
+                return 'evidence-moderate';
+            }
+            return 'evidence-low';
+        }
+
+        function formatText(text) {
+            if (!text) return '';
+            return text
+                .replace(/\n/g, '<br>')
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        }
+    </script>
+</body>
+</html>
