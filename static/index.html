@@ -494,10 +494,14 @@
                 <div class="loading">
                     <div class="spinner"></div>
                     <p>正在检索医学文献，请稍候...</p>
+                    <p style="font-size: 13px; margin-top: 8px; color: #999;">预计需要10-30秒，请耐心等待</p>
                 </div>
             `;
 
             try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 60000);
+
                 const response = await fetch('/api/v1/search', {
                     method: 'POST',
                     headers: {
@@ -507,21 +511,34 @@
                         query: query,
                         max_results: maxResults,
                         generate_summary: generateSummary
-                    })
+                    }),
+                    signal: controller.signal
                 });
 
+                clearTimeout(timeoutId);
+
                 if (!response.ok) {
-                    throw new Error('检索失败');
+                    const errorData = await response.json().catch(() => null);
+                    const errorMsg = errorData?.detail || errorData?.message || '检索失败';
+                    throw new Error(errorMsg);
                 }
 
                 const data = await response.json();
                 displayResults(data);
             } catch (error) {
+                console.error('Search error:', error);
+                let errorMsg = error.message;
+                let errorDetail = error.name;
+                if (error.name === 'AbortError') {
+                    errorMsg = '请求超时';
+                    errorDetail = '服务器响应时间过长，请减少结果数量或取消智能摘要后重试';
+                }
                 resultsContent.innerHTML = `
                     <div class="empty-state">
                         <div class="empty-icon">⚠️</div>
-                        <p>检索失败: ${error.message}</p>
-                        <p style="font-size: 13px; margin-top: 8px;">请检查 API 服务是否正常运行</p>
+                        <p>检索失败: ${errorMsg}</p>
+                        <p style="font-size: 13px; margin-top: 8px;">${errorDetail}</p>
+                        <p style="font-size: 12px; margin-top: 8px; color: #999;">建议：取消"智能摘要"复选框可加快检索速度</p>
                     </div>
                 `;
                 statsSection.style.display = 'none';
@@ -538,14 +555,15 @@
             const resultsCount = document.getElementById('resultsCount');
 
             const results = data.results || [];
-            const total = data.total || results.length;
+            const total = data.results_count || results.length;
 
             document.getElementById('totalResults').textContent = total;
             document.getElementById('responseTime').textContent = responseTime;
 
-            const highEvidenceCount = results.filter(r => 
-                r.evidence_level === 'I' || r.evidence_level === 'II' || r.evidence_level === '高'
-            ).length;
+            const highEvidenceCount = results.filter(r => {
+                const level = r.evidence_info?.level || r.evidence_level || '';
+                return level.includes('I') || level.includes('II') || level.includes('高');
+            }).length;
             document.getElementById('highEvidence').textContent = highEvidenceCount;
 
             statsSection.style.display = 'grid';
@@ -612,20 +630,27 @@
         }
 
         function renderResultCard(result) {
-            const evidenceClass = getEvidenceClass(result.evidence_level);
-            const title = result.title || '无标题';
-            const authors = result.authors || '';
+            const evidenceLevel = result.evidence_info?.level || result.evidence_level || '';
+            const evidenceClass = getEvidenceClass(evidenceLevel);
+            const title = result.title || result.title_zh || '无标题';
+            let authors = '';
+            if (Array.isArray(result.authors)) {
+                authors = result.authors
+                    .map(a => typeof a === 'object' ? (a.name || '') : (typeof a === 'string' ? a : ''))
+                    .filter(n => n)
+                    .join(', ');
+            }
             const journal = result.journal || '';
             const year = result.year || '';
-            const abstract = result.abstract || '暂无摘要';
-            const studyType = result.study_type || '';
+            const abstract = result.abstract_zh || result.abstract || '暂无摘要';
+            const studyType = result.evidence_info?.study_type || result.study_type || '';
 
             return `
                 <div class="result-card">
                     <div class="result-header">
                         <div class="result-title">${title}</div>
                         <span class="evidence-badge ${evidenceClass}">
-                            ${result.evidence_level || '未分级'}
+                            ${evidenceLevel || '未分级'}
                         </span>
                     </div>
                     <div class="result-meta">
