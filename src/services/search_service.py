@@ -37,20 +37,28 @@ class SearchService:
         """
         start_time = time.time()
         
-        knows_result = await self.knows_client.search(
-            query=request.query,
-            max_results=request.max_results,
-            year_from=request.year_from,
-            year_to=request.year_to,
-            evidence_levels=[e.value for e in request.evidence_levels] if request.evidence_levels else None
-        )
+        knows_result = {}
+        try:
+            knows_result = await self.knows_client.search(
+                query=request.query,
+                max_results=request.max_results,
+                year_from=request.year_from,
+                year_to=request.year_to,
+                evidence_levels=[e.value for e in request.evidence_levels] if request.evidence_levels else None
+            )
+        except Exception as e:
+            logger.error(f"KnowS API error: {e}")
+            knows_result = {"results": []}
         
         results: List[LiteratureResult] = knows_result.get("results", [])
         evidence_distribution: Dict[str, int] = {}
         
         for lit in results:
-            level = lit.evidence_info.level.value
-            evidence_distribution[level] = evidence_distribution.get(level, 0) + 1
+            try:
+                level = lit.evidence_info.level.value
+                evidence_distribution[level] = evidence_distribution.get(level, 0) + 1
+            except Exception:
+                evidence_distribution["未知"] = evidence_distribution.get("未知", 0) + 1
         
         summary = None
         clinical_takeaway = None
