@@ -633,7 +633,13 @@
             const evidenceLevel = result.evidence_info?.level || result.evidence_level || '';
             const evidenceClass = getEvidenceClass(evidenceLevel);
             const title = result.title || result.title_zh || '无标题';
-            const authors = Array.isArray(result.authors) ? result.authors.map(a => a.name).join(', ') : '';
+            let authors = '';
+            if (Array.isArray(result.authors)) {
+                authors = result.authors
+                    .map(a => typeof a === 'object' ? (a.name || '') : (typeof a === 'string' ? a : ''))
+                    .filter(n => n)
+                    .join(', ');
+            }
             const journal = result.journal || '';
             const year = result.year || '';
             const abstract = result.abstract_zh || result.abstract || '暂无摘要';
