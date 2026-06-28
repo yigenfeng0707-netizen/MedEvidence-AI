@@ -3,24 +3,40 @@
 整合KnowS API + StepFun大模型能力
 """
 import time
+import logging
 from typing import List, Dict, Any, Optional
-from ..api.knows_client import KnowsClient
-from ..api.stepfun_client import StepFunClient
 from ..models.schemas import QueryRequest, SearchResponse, LiteratureResult
 from ..utils.cache import cache
+
+logger = logging.getLogger(__name__)
 
 
 class SearchService:
     """检索服务"""
     
     def __init__(self):
-        self.knows_client: Optional[KnowsClient] = None
-        self.stepfun_client: Optional[StepFunClient] = None
+        self.knows_client = None
+        self.stepfun_client = None
     
     async def initialize(self):
-        """初始化API客户端"""
-        self.knows_client = KnowsClient()
-        self.stepfun_client = StepFunClient()
+        """初始化API客户端，支持mock模式降级"""
+        try:
+            from ..api.knows_client import KnowsClient
+            self.knows_client = KnowsClient()
+            logger.info("KnowS API客户端初始化成功")
+        except Exception as e:
+            logger.warning(f"KnowS API初始化失败，使用mock模式: {e}")
+            from ..api.knows_client_mock import KnowsClientMock
+            self.knows_client = KnowsClientMock()
+        
+        try:
+            from ..api.stepfun_client import StepFunClient
+            self.stepfun_client = StepFunClient()
+            logger.info("StepFun API客户端初始化成功")
+        except Exception as e:
+            logger.warning(f"StepFun API初始化失败，使用mock模式: {e}")
+            from ..api.stepfun_client_mock import StepFunClientMock
+            self.stepfun_client = StepFunClientMock()
     
     async def search(self, request: QueryRequest) -> SearchResponse:
         """
@@ -34,7 +50,6 @@ class SearchService:
         """
         start_time = time.time()
         
-        # 1. 调用KnowS API检索（返回已解析的 LiteratureResult 对象列表 + question_id）
         knows_result = {}
         try:
             knows_result = await self.knows_client.search(
@@ -44,10 +59,10 @@ class SearchService:
                 year_to=request.year_to,
                 evidence_levels=[e.value for e in request.evidence_levels] if request.evidence_levels else None
             )
-        except Exception:
+        except Exception as e:
+            logger.error(f"KnowS API error: {e}")
             knows_result = {"results": []}
         
-        # 2. 结果整理与分布统计
         results: List[LiteratureResult] = knows_result.get("results", [])
         evidence_distribution: Dict[str, int] = {}
         
@@ -58,37 +73,44 @@ class SearchService:
             except Exception:
                 evidence_distribution["未知"] = evidence_distribution.get("未知", 0) + 1
         
-        # 3. 生成智能摘要（使用StepFun）
         summary = None
         clinical_takeaway = None
         
-        if request.generate_summary and results:
+        if request.generate_summary and results and self.stepfun_client:
             try:
-                # 为每篇文献生成中文摘要
                 for lit in results[:5]:
                     if lit.abstract:
-                        translation = await self.stepfun_client.translate_and_summarize(
-                            title=lit.title,
-                            abstract=lit.abstract
-                        )
-                        lit.title_zh = translation.get("title_zh")
-                        lit.abstract_zh = translation.get("abstract_zh")
-                        lit.clinical_significance = translation.get("clinical_significance")
+                        try:
+                            translation = await self.stepfun_client.translate_and_summarize(
+                                title=lit.title,
+                                abstract=lit.abstract
+                            )
+                            lit.title_zh = translation.get("title_zh")
+                            lit.abstract_zh = translation.get("abstract_zh")
+                            lit.clinical_significance = translation.get("clinical_significance")
+                        except Exception as e:
+                            logger.warning(f"Failed to translate/summarize article: {e}")
                 
-                # 生成整体摘要
                 results_dict = [r.model_dump() for r in results[:10]]
-                summary = await self.stepfun_client.generate_overall_summary(
-                    query=request.query,
-                    results=results_dict
-                )
                 
-                # 生成临床要点
-                clinical_takeaway = await self.stepfun_client.generate_clinical_takeaway(
-                    query=request.query,
-                    top_results=results_dict[:3]
-                )
-            except Exception:
-                pass
+                try:
+                    summary = await self.stepfun_client.generate_overall_summary(
+                        query=request.query,
+                        results=results_dict
+                    )
+                except Exception as e:
+                    logger.warning(f"Failed to generate overall summary: {e}")
+                
+                try:
+                    clinical_takeaway = await self.stepfun_client.generate_clinical_takeaway(
+                        query=request.query,
+                        top_results=results_dict[:3]
+                    )
+                except Exception as e:
+                    logger.warning(f"Failed to generate clinical takeaway: {e}")
+            
+            except Exception as e:
+                logger.error(f"StepFun API error during search: {e}")
         
         search_time = int((time.time() - start_time) * 1000)
         
