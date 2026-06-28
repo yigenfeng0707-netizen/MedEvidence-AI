@@ -60,18 +60,25 @@ class StepFunClient:
 （用2-3句话总结该研究对临床实践的启示，包括：1.主要发现 2.临床适用人群 3.实践建议）
 """
         
-        response = await self.client.chat.completions.create(
-            model=self.model,
-            messages=[
-                {"role": "system", "content": "你是一位精通医学英语和临床医学的资深医学专家，擅长翻译医学文献并提炼临床价值。"},
-                {"role": "user", "content": prompt}
-            ],
-            temperature=0.3,
-            max_tokens=1500
-        )
-        
-        content = response.choices[0].message.content
-        return self._parse_response(content)
+        try:
+            response = await self.client.chat.completions.create(
+                model=self.model,
+                messages=[
+                    {"role": "system", "content": "你是一位精通医学英语和临床医学的资深医学专家，擅长翻译医学文献并提炼临床价值。"},
+                    {"role": "user", "content": prompt}
+                ],
+                temperature=0.3,
+                max_tokens=1500
+            )
+            
+            content = response.choices[0].message.content
+            return self._parse_response(content)
+        except Exception:
+            return {
+                "title_zh": title,
+                "abstract_zh": abstract,
+                "clinical_significance": ""
+            }
     
     def _parse_response(self, content: str) -> Dict[str, str]:
         """解析模型输出"""
@@ -134,26 +141,30 @@ class StepFunClient:
 
 要求：专业、简洁、基于证据，不超过300字。"""
         
-        response = await self.client.chat.completions.create(
-            model=self.model,
-            messages=[
-                {"role": "system", "content": "你是一位循证医学专家，擅长系统综述和证据综合。"},
-                {"role": "user", "content": prompt}
-            ],
-            temperature=0.4,
-            max_tokens=800
-        )
-        
-        return response.choices[0].message.content
+        try:
+            response = await self.client.chat.completions.create(
+                model=self.model,
+                messages=[
+                    {"role": "system", "content": "你是一位循证医学专家，擅长系统综述和证据综合。"},
+                    {"role": "user", "content": prompt}
+                ],
+                temperature=0.4,
+                max_tokens=800
+            )
+            
+            return response.choices[0].message.content
+        except Exception:
+            return ""
     
     async def generate_clinical_takeaway(self, query: str, top_results: List[Dict[str, Any]]) -> str:
         """生成临床要点"""
-        evidence_summary = "\n".join([
-            f"- {r['evidence_info']['level']}: {r['title']}"
-            for r in top_results[:3]
-        ])
-        
-        prompt = f"""基于以下高等级证据，生成临床决策要点：
+        try:
+            evidence_summary = "\n".join([
+                f"- {r['evidence_info']['level']}: {r['title']}"
+                for r in top_results[:3]
+            ])
+            
+            prompt = f"""基于以下高等级证据，生成临床决策要点：
 
 查询主题：{query}
 
@@ -163,15 +174,17 @@ class StepFunClient:
 请用1-2句话总结临床要点，格式如：
 "推荐等级：强/中等/弱。临床决策建议：..."
 """
-        
-        response = await self.client.chat.completions.create(
-            model=self.model,
-            messages=[
-                {"role": "system", "content": "你是一位临床医学专家，擅长循证医学和临床决策。"},
-                {"role": "user", "content": prompt}
-            ],
-            temperature=0.3,
-            max_tokens=300
-        )
-        
-        return response.choices[0].message.content
+            
+            response = await self.client.chat.completions.create(
+                model=self.model,
+                messages=[
+                    {"role": "system", "content": "你是一位临床医学专家，擅长循证医学和临床决策。"},
+                    {"role": "user", "content": prompt}
+                ],
+                temperature=0.3,
+                max_tokens=300
+            )
+            
+            return response.choices[0].message.content
+        except Exception:
+            return ""

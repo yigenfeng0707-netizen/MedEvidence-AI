@@ -85,7 +85,12 @@ class KnowsClient:
                 data = resp.json()
                 if not question_id:
                     question_id = data.get("question_id", "")
-                for ev in data.get("evidences", []):
+                evidences = data.get("evidences", [])
+                if not isinstance(evidences, list):
+                    return
+                for ev in evidences:
+                    if not isinstance(ev, dict):
+                        continue
                     title = (ev.get("title") or "").strip()
                     if not title or title in seen_titles:
                         continue
