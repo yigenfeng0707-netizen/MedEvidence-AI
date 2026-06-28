@@ -494,10 +494,14 @@
                 <div class="loading">
                     <div class="spinner"></div>
                     <p>正在检索医学文献，请稍候...</p>
+                    <p style="font-size: 13px; margin-top: 8px; color: #999;">预计需要10-30秒，请耐心等待</p>
                 </div>
             `;
 
             try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 60000);
+
                 const response = await fetch('/api/v1/search', {
                     method: 'POST',
                     headers: {
@@ -507,8 +511,11 @@
                         query: query,
                         max_results: maxResults,
                         generate_summary: generateSummary
-                    })
+                    }),
+                    signal: controller.signal
                 });
+
+                clearTimeout(timeoutId);
 
                 if (!response.ok) {
                     const errorData = await response.json().catch(() => null);
@@ -520,12 +527,18 @@
                 displayResults(data);
             } catch (error) {
                 console.error('Search error:', error);
+                let errorMsg = error.message;
+                let errorDetail = error.name;
+                if (error.name === 'AbortError') {
+                    errorMsg = '请求超时';
+                    errorDetail = '服务器响应时间过长，请减少结果数量或取消智能摘要后重试';
+                }
                 resultsContent.innerHTML = `
                     <div class="empty-state">
                         <div class="empty-icon">⚠️</div>
-                        <p>检索失败: ${error.message}</p>
-                        <p style="font-size: 13px; margin-top: 8px;">请检查网络连接或稍后重试</p>
-                        <p style="font-size: 12px; margin-top: 4px; color: #999;">错误详情: ${error.name}</p>
+                        <p>检索失败: ${errorMsg}</p>
+                        <p style="font-size: 13px; margin-top: 8px;">${errorDetail}</p>
+                        <p style="font-size: 12px; margin-top: 8px; color: #999;">建议：取消"智能摘要"复选框可加快检索速度</p>
                     </div>
                 `;
                 statsSection.style.display = 'none';
