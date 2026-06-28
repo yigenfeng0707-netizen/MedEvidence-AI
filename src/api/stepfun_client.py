@@ -121,13 +121,13 @@ class StepFunClient:
         Returns:
             整体摘要文本
         """
-        # 构建提示词
-        titles_and_abstracts = "\n\n".join([
-            f"文献{i+1}: {r['title']}\n摘要: {r.get('abstract', '无')[:300]}..."
-            for i, r in enumerate(results[:5])  # 只取前5篇
-        ])
-        
-        prompt = f"""用户查询：{query}
+        try:
+            titles_and_abstracts = "\n\n".join([
+                f"文献{i+1}: {r.get('title', '无标题')}\n摘要: {(r.get('abstract') or '无')[:300]}"
+                for i, r in enumerate(results[:5])  # 只取前5篇
+            ])
+            
+            prompt = f"""用户查询：{query}
 
 检索到以下相关文献，请生成一个简洁的循证医学综述摘要：
 
@@ -140,8 +140,7 @@ class StepFunClient:
 4. 对临床实践的建议
 
 要求：专业、简洁、基于证据，不超过300字。"""
-        
-        try:
+            
             response = await self.client.chat.completions.create(
                 model=self.model,
                 messages=[
@@ -160,7 +159,7 @@ class StepFunClient:
         """生成临床要点"""
         try:
             evidence_summary = "\n".join([
-                f"- {r['evidence_info']['level']}: {r['title']}"
+                f"- {(r.get('evidence_info') or {}).get('level', '未知')}: {r.get('title', '无标题')}"
                 for r in top_results[:3]
             ])
             
