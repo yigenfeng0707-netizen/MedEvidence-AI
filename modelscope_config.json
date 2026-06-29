@@ -17,14 +17,14 @@
     "branch": "master",
     "python_version": "3.11"
   },
-  "startup_command": "uvicorn src.main:app --host 0.0.0.0 --port 8000",
-  "port": 8000,
+  "startup_command": "uvicorn src.main:app --host 0.0.0.0 --port 7860",
+  "port": 7860,
   "environment_variables": {
     "STEPFUN_MODEL": "step-2-16k",
     "STEPFUN_API_BASE": "https://api.stepfun.com/v1",
     "KNOWS_API_BASE": "https://api.nullht.com/v1",
     "DEBUG": "false",
-    "PORT": "8000",
+    "PORT": "7860",
     "CACHE_ENABLED": "true",
     "CACHE_TTL": "3600",
     "LOG_LEVEL": "INFO"
