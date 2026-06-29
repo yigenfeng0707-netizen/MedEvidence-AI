@@ -35,7 +35,7 @@ environment_variables:
   - name: KNOWS_API_BASE
     value: https://api.nullht.com/v1
   - name: PORT
-    value: "8000"
+    value: "7860"
   - name: DEBUG
     value: "false"
   - name: CACHE_ENABLED
