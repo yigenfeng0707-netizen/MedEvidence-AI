@@ -2,6 +2,9 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
+# 强制设置uvicorn端口环境变量（uvicorn只认UVICORN_PORT，不认PORT）
+ENV UVICORN_PORT=7860
+ENV UVICORN_HOST=0.0.0.0
 ENV PORT=7860
 ENV HOST=0.0.0.0
 
