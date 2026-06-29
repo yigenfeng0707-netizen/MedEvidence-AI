@@ -18,9 +18,9 @@ source:
   branch: master
 
 runtime:
-  command: uvicorn src.main:app --host 0.0.0.0 --port 8000
+  command: uvicorn src.main:app --host 0.0.0.0 --port 7860
   python_version: "3.11"
-  port: 8000
+  port: 7860
 
 environment_variables:
   - name: KNOWS_API_KEY
