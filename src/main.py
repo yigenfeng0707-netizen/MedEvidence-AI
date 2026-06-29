@@ -10,6 +10,10 @@ from contextlib import asynccontextmanager
 load_dotenv()
 from datetime import datetime
 from typing import Dict
+import json
+import threading
+import urllib.request as urllib_req
+from http.server import BaseHTTPRequestHandler, HTTPServer
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -28,11 +32,73 @@ from .services.search_service import SearchService
 search_service = SearchService()
 
 
+def _start_health_proxy():
+    """
+    魔搭SDK默认探测7860端口做健康检查，但它启动的uvicorn实际跑在8000端口。
+    这里在7860端口启动一个微型HTTP代理，把请求转发到8000端口，
+    让魔搭健康检查通过。
+    """
+    target_port = int(os.getenv("APP_PORT", "8000"))
+    proxy_port = int(os.getenv("HEALTH_PROXY_PORT", "7860"))
+
+    class ProxyHandler(BaseHTTPRequestHandler):
+        def do_GET(self):
+            self._proxy("GET", None)
+
+        def do_POST(self):
+            length = int(self.headers.get("Content-Length", 0))
+            body = self.rfile.read(length) if length else None
+            self._proxy("POST", body)
+
+        def do_OPTIONS(self):
+            self.send_response(200)
+            self.send_header("Access-Control-Allow-Origin", "*")
+            self.send_header("Access-Control-Allow-Methods", "*")
+            self.send_header("Access-Control-Allow-Headers", "*")
+            self.end_headers()
+
+        def _proxy(self, method, body):
+            try:
+                url = f"http://127.0.0.1:{target_port}{self.path}"
+                req = urllib_req.Request(
+                    url,
+                    data=body,
+                    method=method,
+                    headers={"Content-Type": self.headers.get("Content-Type", "application/json")}
+                )
+                with urllib_req.urlopen(req, timeout=30) as resp:
+                    content = resp.read()
+                    self.send_response(resp.status)
+                    for key, value in resp.headers.items():
+                        if key.lower() in ("content-type", "content-length"):
+                            self.send_header(key, value)
+                    self.end_headers()
+                    self.wfile.write(content)
+            except Exception as e:
+                self.send_response(503)
+                self.send_header("Content-Type", "application/json")
+                self.end_headers()
+                self.wfile.write(json.dumps({"detail": f"upstream error: {str(e)}"}).encode())
+
+        def log_message(self, format, *args):
+            pass
+
+    def run_server():
+        server = HTTPServer(("0.0.0.0", proxy_port), ProxyHandler)
+        server.serve_forever()
+
+    thread = threading.Thread(target=run_server, daemon=True)
+    thread.start()
+    print(f"[HealthProxy] Started on port {proxy_port} -> {target_port}")
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """应用生命周期管理"""
     # 启动时初始化
     await search_service.initialize()
+    # 启动7860端口健康检查代理
+    _start_health_proxy()
     yield
     # 关闭时清理
     await search_service.close()
