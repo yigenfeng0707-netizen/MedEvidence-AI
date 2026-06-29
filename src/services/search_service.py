@@ -2,6 +2,7 @@
 医学文献检索核心服务
 整合KnowS API + StepFun大模型能力
 """
+import asyncio
 import time
 import logging
 from typing import List, Dict, Any, Optional
@@ -17,6 +18,13 @@ class SearchService:
     def __init__(self):
         self.knows_client = None
         self.stepfun_client = None
+        self._ready = asyncio.Event()
+    
+    def is_ready(self) -> bool:
+        return self._ready.is_set()
+    
+    async def ensure_ready(self) -> None:
+        await self._ready.wait()
     
     async def initialize(self):
         """初始化API客户端，支持mock模式降级"""
@@ -37,6 +45,8 @@ class SearchService:
             logger.warning(f"StepFun API初始化失败，使用mock模式: {e}")
             from ..api.stepfun_client_mock import StepFunClientMock
             self.stepfun_client = StepFunClientMock()
+        finally:
+            self._ready.set()
     
     async def search(self, request: QueryRequest) -> SearchResponse:
         """
@@ -48,6 +58,7 @@ class SearchService:
         Returns:
             检索响应
         """
+        await self.ensure_ready()
         start_time = time.time()
         
         knows_result = {}
