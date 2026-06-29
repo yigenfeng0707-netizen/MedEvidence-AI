@@ -34,12 +34,13 @@ search_service = SearchService()
 
 def _start_health_proxy():
     """
-    魔搭SDK默认探测7860端口做健康检查，但它启动的uvicorn实际跑在8000端口。
-    这里在7860端口启动一个微型HTTP代理，把请求转发到8000端口，
-    让魔搭健康检查通过。
+    仅在应用端口与健康检查端口不一致时启动代理（历史兼容）。
+    当前配置已统一为7860，默认跳过。
     """
-    target_port = int(os.getenv("APP_PORT", "8000"))
+    target_port = int(os.getenv("APP_PORT", os.getenv("PORT", "7860")))
     proxy_port = int(os.getenv("HEALTH_PROXY_PORT", "7860"))
+    if target_port == proxy_port:
+        return
 
     class ProxyHandler(BaseHTTPRequestHandler):
         def do_GET(self):
